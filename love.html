@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>для тебя</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+
+  * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0a0a0a;
+    color: #e0e0e0;
+    overflow: hidden;
+    height: 100vh;
+    cursor: crosshair;
+  }
+
+  .grain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  .bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(ellipse at 20% 80%, rgba(139, 0, 0, 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(75, 0, 75, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(20, 0, 0, 0.4) 0%, transparent 70%),
+      #0a0a0a;
+    z-index: 0;
+  }
+
+  .stars {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0;
+    animation: twinkle 4s ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 0.5; }
+  }
+
+  .container {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 20px;
+  }
+
+  #welcome-screen {
+    text-align: center;
+    animation: fadeIn 2s ease-in;
+  }
+
+  .title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 10vw, 6rem);
+    font-weight: 300;
+    letter-spacing: -2px;
+    color: #e0e0e0;
+    margin-bottom: 20px;
+    position: relative;
+    display: inline-block;
+  }
+
+  .title::after {
+    content: '✦';
+    position: absolute;
+    top: -20px;
+    right: -40px;
+    font-size: 2rem;
+    color: #8b0000;
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 60px;
+    font-weight: 300;
+  }
+
+  .enter-btn {
+    background: transparent;
+    border: 1px solid #333;
+    color: #888;
+    padding: 18px 50px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+  }
+
+  .enter-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .enter-btn:hover {
+    border-color: #8b0000;
+    color: #e0e0e0;
+    letter-spacing: 6px;
+  }
+
+  .enter-btn:hover::before {
+    left: 100%;
+  }
+
+  .screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 600px;
+    animation: fadeIn 1s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .quest-box {
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid #222;
+    padding: 50px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    width: 100%;
+  }
+
+  .quest-box::before {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    right: 1px;
+    bottom: 1px;
+    background: linear-gradient(135deg, rgba(139, 0, 0, 0.08), transparent);
+    pointer-events: none;
+  }
+
+  .quest-number {
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    color: #444;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+  }
+
+  .quest-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.9rem;
+    font-weight: 400;
+    color: #e0e0e0;
+    margin-bottom: 40px;
+    line-height: 1.4;
+    font-style: italic;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+
+  .option {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid #222;
+    padding: 15px 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    color: #777;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 1px;
+  }
+
+  .option::before {
+    content: '›';
+    position: absolute;
+    left: 15px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    color: #8b0000;
+  }
+
+  .option:hover {
+    border-color: #444;
+    color: #e0e0e0;
+    padding-left: 35px;
+  }
+
+  .option:hover::before {
+    opacity: 1;
+    left: 20px;
+  }
+
+  .option.selected {
+    border-color: #8b0000;
+    color: #e0e0e0;
+    background: rgba(139, 0, 0, 0.05);
+  }
+
+  .option.selected::before {
+    opacity: 1;
+    left: 20px;
+  }
+
+  .error {
+    color: #8b0000;
+    font-size: 0.75rem;
+    margin-top: 15px;
+    letter-spacing: 2px;
+    min-height: 20px;
+  }
+
+  .captcha-box {
+    text-align: center;
+  }
+
+  .captcha-display {
+    font-family: 'Courier New', monospace;
+    font-size: 2rem;
+    letter-spacing: 15px;
+    color: #444;
+    margin: 30px 0;
+    padding: 20px;
+    border: 1px solid #222;
+    background: rgba(0, 0, 0, 0.3);
+    user-select: none;
+  }
+
+  .captcha-input {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid #333;
+    padding: 15px 25px;
+    color: #e0e0e0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    outline: none;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+  }
+
+  .captcha-input:focus {
+    border-color: #8b0000;
+  }
+
+  .photo-container {
+    position: relative;
+    padding: 30px;
+    background: rgba(20, 20, 20, 0.8);
+    border: 1px solid #222;
+  }
+
+  .photo-container::before {
+    content: '';
+    position: absolute;
+    border: 1px solid rgba(139, 0, 0, 0.3);
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    pointer-events: none;
+  }
+
+  .photo {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    filter: grayscale(40%) contrast(1.1);
+    transition: all 0.5s ease;
+    display: block;
+  }
+
+  .photo-container:hover .photo {
+    filter: grayscale(0%) contrast(1.2);
+  }
+
+  .final-text {
+    margin-top: 40px;
+    text-align: center;
+  }
+
+  .final-text h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: #e0e0e0;
+    margin-bottom: 15px;
+    letter-spacing: -1px;
+  }
+
+  .final-text p {
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    color: #555;
+    text-transform: uppercase;
+  }
+
+  .bonus-btn {
+    margin-top: 40px;
+    background: transparent;
+    border: 1px solid #2a2a2a;
+    color: #666;
+    padding: 14px 35px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.4s ease;
+  }
+
+  .bonus-btn:hover {
+    border-color: #8b0000;
+    color: #e0e0e0;
+    letter-spacing: 5px;
+  }
+
+  .particle {
+    position: fixed;
+    width: 3px;
+    height: 3px;
+    background: rgba(139, 0, 0, 0.4);
+    pointer-events: none;
+    z-index: 5;
+    animation: float 10s linear infinite;
+  }
+
+  @keyframes float {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+  }
+
+  .cursor-glow {
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(139, 0, 0, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 2;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Бегущий кот */
+  .running-cat {
+    position: fixed;
+    width: 80px;
+    height: 80px;
+    z-index: 10000;
+    pointer-events: none;
+    transition: transform 0.1s linear;
+  }
+
+  .running-cat svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (max-width: 600px) {
+    .quest-box { padding: 30px 25px; }
+    .quest-text { font-size: 1.5rem; }
+    .photo-container { padding: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="bg"></div>
+<div class="stars" id="stars"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<div class="container">
+  <div id="welcome-screen">
+    <h1 class="title">для тебя</h1>
+    <p class="subtitle">кое-что особенное</p>
+    <button class="enter-btn" onclick="startQuest()">войти</button>
+  </div>
+
+  <div class="screen" id="quest-screen">
+    <div class="quest-box">
+      <div class="quest-number" id="quest-number">01 / 03</div>
+      <div class="quest-text" id="quest-text">вопрос</div>
+      <div class="options" id="options"></div>
+      <div class="error" id="error"></div>
+      <button class="enter-btn" onclick="checkAnswer()">продолжить</button>
+    </div>
+  </div>
+
+  <div class="screen" id="captcha-screen">
+    <div class="quest-box captcha-box">
+      <div class="quest-number">проверка</div>
+      <div class="quest-text">докажи, что это ты</div>
+      <div class="captcha-display" id="captcha-code"></div>
+      <input type="text" class="captcha-input" id="captcha-input" maxlength="4" autocomplete="off">
+      <div class="error" id="captcha-error"></div>
+      <button class="enter-btn" onclick="checkCaptcha()" style="margin-top: 25px;">открыть</button>
+    </div>
+  </div>
+
+  <div class="screen" id="final-screen">
+    <div class="photo-container">
+      <img src="c:\Users\hevon\Pictures\ятёма.jpg" alt="мы" class="photo" id="photo">
+    </div>
+    <div class="final-text">
+      <h2>ты — мой человек</h2>
+      <p>всегда и навсегда</p>
+    </div>
+    <button class="bonus-btn" onclick="releaseCat()">и ещё кое-что...</button>
+  </div>
+</div>
+
+<script>
+  const starsContainer = document.getElementById('stars');
+  for (let i = 0; i < 50; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDelay = Math.random() * 4 + 's';
+    star.style.animationDuration = (Math.random() * 4 + 3) + 's';
+    starsContainer.appendChild(star);
+  }
+
+  setInterval(() => {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.animationDuration = (Math.random() * 5 + 8) + 's';
+    document.body.appendChild(particle);
+    setTimeout(() => particle.remove(), 13000);
+  }, 2000);
+
+  const cursorGlow = document.getElementById('cursorGlow');
+  document.addEventListener('mousemove', (e) => {
+    cursorGlow.style.left = e.clientX + 'px';
+    cursorGlow.style.top = e.clientY + 'px';
+  });
+
+  const quests = [
+    {
+      text: "что ты чувствуешь, когда я рядом?",
+      options: ["ничего особенного", "спокойствие и тепло", "раздражение", "равнодушие"],
+      correct: 1
+    },
+    {
+      text: "кто для тебя самый важный?",
+      options: ["я", "ты", "никто", "не знаю"],
+      correct: 1
+    },
+    {
+      text: "как сильно я мне дорога?",
+      options: ["не очень", "больше, чем я показываю", "больше всего на свете", "хуйня"],
+      correct: 2
+    }
+  ];
+
+  let currentQuest = 0;
+  let selectedAnswer = null;
+
+  function startQuest() {
+    document.getElementById('welcome-screen').style.display = 'none';
+    document.getElementById('quest-screen').style.display = 'flex';
+    showQuest();
+  }
+
+  function showQuest() {
+    const q = quests[currentQuest];
+    document.getElementById('quest-number').textContent = `0${currentQuest + 1} / 0${quests.length}`;
+    document.getElementById('quest-text').textContent = q.text;
+    document.getElementById('error').textContent = '';
+    selectedAnswer = null;
+
+    const optionsContainer = document.getElementById('options');
+    optionsContainer.innerHTML = '';
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement('div');
+      btn.className = 'option';
+      btn.textContent = opt;
+      btn.onclick = () => selectAnswer(idx, btn);
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  function selectAnswer(idx, btn) {
+    selectedAnswer = idx;
+    document.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
+
+  function checkAnswer() {
+    if (selectedAnswer === null) {
+      document.getElementById('error').textContent = 'выбери вариант';
+      return;
+    }
+    if (selectedAnswer !== quests[currentQuest].correct) {
+      document.getElementById('error').textContent = 'попробуй ещё раз';
+      return;
+    }
+    currentQuest++;
+    if (currentQuest < quests.length) {
+      showQuest();
+    } else {
+      showCaptcha();
+    }
+  }
+
+  let captchaCode = '';
+  function showCaptcha() {
+    document.getElementById('quest-screen').style.display = 'none';
+    document.getElementById('captcha-screen').style.display = 'flex';
+    
+    const chars = 'LOVE';
+    captchaCode = '';
+    for (let i = 0; i < 4; i++) {
+      captchaCode += chars[Math.floor(Math.random() * chars.length)];
+    }
+    document.getElementById('captcha-code').textContent = captchaCode;
+    document.getElementById('captcha-input').value = '';
+    document.getElementById('captcha-error').textContent = '';
+  }
+
+  function checkCaptcha() {
+    const input = document.getElementById('captcha-input').value.trim().toUpperCase();
+    if (input === captchaCode) {
+      showFinal();
+    } else {
+      document.getElementById('captcha-error').textContent = 'неверно';
+    }
+  }
+
+  document.getElementById('captcha-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') checkCaptcha();
+  });
+
+  function showFinal() {
+    document.getElementById('captcha-screen').style.display = 'none';
+    document.getElementById('final-screen').style.display = 'flex';
+  }
+
+  // ===== БЕГУЩИЙ КОТ =====
+  function releaseCat() {
+    const catSVG = `
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <!-- тело (чёрное) -->
+        <ellipse cx="50" cy="65" rx="28" ry="20" fill="#1a1a1a"/>
+        <!-- голова (чёрная) -->
+        <circle cx="50" cy="38" r="18" fill="#1a1a1a"/>
+        <!-- уши -->
+        <polygon points="35,28 32,12 45,22" fill="#1a1a1a"/>
+        <polygon points="65,28 68,12 55,22" fill="#1a1a1a"/>
+        <!-- внутренняя часть ушей (коричневая) -->
+        <polygon points="37,26 35,16 43,23" fill="#6b3410"/>
+        <polygon points="63,26 65,16 57,23" fill="#6b3410"/>
+        <!-- белое пятно на груди -->
+        <ellipse cx="50" cy="72" rx="12" ry="10" fill="#f5f5f0"/>
+        <!-- белое пятно на мордочке -->
+        <ellipse cx="50" cy="45" rx="8" ry="6" fill="#f5f5f0"/>
+        <!-- коричневое пятно на спине -->
+        <ellipse cx="55" cy="60" rx="10" ry="7" fill="#6b3410"/>
+        <!-- глаза -->
+        <ellipse cx="44" cy="37" rx="3" ry="4" fill="#d4af37"/>
+        <ellipse cx="56" cy="37" rx="3" ry="4" fill="#d4af37"/>
+        <circle cx="44" cy="37" r="1.5" fill="#000"/>
+        <circle cx="56" cy="37" r="1.5" fill="#000"/>
+        <!-- нос -->
+        <polygon points="48,43 52,43 50,46" fill="#ff9999"/>
+        <!-- рот -->
+        <path d="M 50 46 Q 47 49 45 48" stroke="#333" stroke-width="0.8" fill="none"/>
+        <path d="M 50 46 Q 53 49 55 48" stroke="#333" stroke-width="0.8" fill="none"/>
+        <!-- усы -->
+        <line x1="35" y1="44" x2="20" y2="42" stroke="#666" stroke-width="0.5"/>
+        <line x1="35" y1="46" x2="20" y2="47" stroke="#666" stroke-width="0.5"/>
+        <line x1="65" y1="44" x2="80" y2="42" stroke="#666" stroke-width="0.5"/>
+        <line x1="65" y1="46" x2="80" y2="47" stroke="#666" stroke-width="0.5"/>
+        <!-- лапы -->
+        <ellipse cx="35" cy="82" rx="5" ry="7" fill="#1a1a1a"/>
+        <ellipse cx="65" cy="82" rx="5" ry="7" fill="#1a1a1a"/>
+        <!-- белые кончики лап -->
+        <ellipse cx="35" cy="86" rx="4" ry="3" fill="#f5f5f0"/>
+        <ellipse cx="65" cy="86" rx="4" ry="3" fill="#f5f5f0"/>
+        <!-- хвост -->
+        <path d="M 75 70 Q 90 65 88 50 Q 86 42 82 45" stroke="#1a1a1a" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <path d="M 85 48 Q 84 45 82 45" stroke="#6b3410" stroke-width="4" fill="none" stroke-linecap="round"/>
+      </svg>
+    `;
+
+    const cats = [];
+    const numCats = 5;
+
+    for (let i = 0; i < numCats; i++) {
+      setTimeout(() => {
+        const cat = document.createElement('div');
+        cat.className = 'running-cat';
+        cat.innerHTML = catSVG;
+        document.body.appendChild(cat);
+
+        let x = Math.random() * (window.innerWidth - 100);
+        let y = Math.random() * (window.innerHeight - 100);
+        let vx = (Math.random() - 0.5) * 8;
+        let vy = (Math.random() - 0.5) * 8;
+        let facing = vx >= 0 ? 1 : -1;
+
+        cats.push({ el: cat, x, y, vx, vy, facing });
+      }, i * 400);
+    }
+
+    function animateCats() {
+      cats.forEach(cat => {
+        cat.x += cat.vx;
+        cat.y += cat.vy;
+
+        if (cat.x <= 0 || cat.x >= window.innerWidth - 80) {
+          cat.vx *= -1;
+          cat.facing = cat.vx >= 0 ? 1 : -1;
+        }
+        if (cat.y <= 0 || cat.y >= window.innerHeight - 80) {
+          cat.vy *= -1;
+        }
+
+        // случайное изменение направления
+        if (Math.random() < 0.02) {
+          cat.vx += (Math.random() - 0.5) * 4;
+          cat.vy += (Math.random() - 0.5) * 4;
+          cat.vx = Math.max(-10, Math.min(10, cat.vx));
+          cat.vy = Math.max(-10, Math.min(10, cat.vy));
+          cat.facing = cat.vx >= 0 ? 1 : -1;
+        }
+
+        cat.el.style.left = cat.x + 'px';
+        cat.el.style.top = cat.y + 'px';
+        cat.el.style.transform = `scaleX(${cat.facing})`;
+      });
+
+      requestAnimationFrame(animateCats);
+    }
+
+    animateCats();
+  }
+</script>
+
+</body>
+</html>
